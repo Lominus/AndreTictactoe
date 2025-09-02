@@ -9,18 +9,11 @@
     <style>
         :root {
             --board-size: 3;
-            --bg-color: #121212;
-            --card-color: #1e1e1e;
-            --accent-green: #4caf50;
-            --accent-purple: #9c27b0;
-            --text-color: #e0e0e0;
-            --subtle-text: #a0a0a0;
         }
-
         body {
             font-family: 'Inter', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            background-color: #1a202c;
+            color: #e2e8f0;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -31,42 +24,38 @@
         }
 
         .game-container {
-            background-color: var(--card-color);
+            background-color: #2d3748;
             padding: 3rem;
-            border-radius: 2rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
             text-align: center;
             width: 100%;
             max-width: 600px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .game-title {
-            font-size: 3rem;
+            font-size: 2.5rem;
             font-weight: 700;
-            color: #ffffff;
-            letter-spacing: 2px;
-            margin-bottom: 0.5rem;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+            color: #63b3ed;
+            margin-bottom: 1rem;
         }
 
         .status {
             font-size: 1.5rem;
             font-weight: 700;
             min-height: 2.5rem;
-            margin-bottom: 2rem;
-            color: var(--text-color);
+            margin-bottom: 1.5rem;
+            color: #cbd5e0;
         }
 
         .score-board {
             display: flex;
             justify-content: space-around;
-            background-color: #242424;
-            padding: 1.5rem;
-            border-radius: 1.5rem;
+            background-color: #4a5568;
+            padding: 1rem;
+            border-radius: 0.75rem;
             margin-bottom: 2rem;
-            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .score-item {
@@ -75,27 +64,25 @@
 
         .score-label {
             font-size: 1rem;
-            color: var(--subtle-text);
-            font-weight: 500;
+            color: #a0aec0;
         }
 
         .score-value {
-            font-size: 2.5rem;
+            font-size: 1.875rem;
             font-weight: 700;
-            color: #ffffff;
-            text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+            color: #e2e8f0;
         }
 
         .board-info {
             font-size: 1rem;
-            color: var(--subtle-text);
+            color: #a0aec0;
             margin-bottom: 1rem;
         }
         
         .board {
             display: grid;
             grid-template-columns: repeat(var(--board-size), 1fr);
-            gap: 1rem;
+            gap: 0.5rem;
             margin-bottom: 2rem;
             aspect-ratio: 1 / 1;
             width: 100%;
@@ -103,48 +90,57 @@
         }
 
         .cell {
-            background-color: #2e2e2e;
+            background-color: #4a5568;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 3.5rem;
+            font-size: 2.5rem;
             font-weight: 700;
             cursor: pointer;
-            border-radius: 1rem;
-            transition: background-color 0.3s;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            color: transparent;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            color: #a0aec0;
         }
 
-        /* Perbaikan: Menghilangkan efek hover/active agar kotak tidak bergerak */
         .cell:not(.full):hover {
-            background-color: #404040;
-        }
-        
-        .cell:not(.full):active {
-            background-color: #2e2e2e;
+            background-color: #6b7280;
         }
 
         .cell.x {
-            color: var(--accent-green);
+            color: #f56565;
+            text-shadow: 0 0 5px #f56565, 0 0 10px #f56565, 0 0 15px #f56565;
+            animation: pulse-x 1.5s infinite;
         }
 
         .cell.o {
-            color: var(--accent-purple);
+            color: #48bb78;
+            text-shadow: 0 0 5px #48bb78, 0 0 10px #48bb78, 0 0 15px #48bb78;
+            animation: pulse-o 1.5s infinite;
+        }
+
+        @keyframes pulse-x {
+            0%, 100% { text-shadow: 0 0 5px #f56565, 0 0 10px #f56565; }
+            50% { text-shadow: 0 0 10px #f56565, 0 0 20px #f56565; }
+        }
+
+        @keyframes pulse-o {
+            0%, 100% { text-shadow: 0 0 5px #48bb78, 0 0 10px #48bb78; }
+            50% { text-shadow: 0 0 10px #48bb78, 0 0 20px #48bb78; }
         }
         
         .cell.full {
             cursor: not-allowed;
+            animation: none;
         }
 
         #winningLine {
             position: absolute;
-            background-color: #ffffff;
+            background-color: #68d391;
             z-index: 10;
             border-radius: 9999px;
             pointer-events: none;
             transition: width 0.5s ease-out, height 0.5s ease-out;
-            box-shadow: 0 0 10px #ffffff, 0 0 20px #ffffff, 0 0 30px #ffffff;
         }
         
         .game-controls {
@@ -163,20 +159,16 @@
 
         .difficulty-select label {
             font-size: 1rem;
-            color: var(--subtle-text);
+            color: #a0aec0;
         }
 
         .difficulty-select select {
-            background-color: #2e2e2e;
-            color: var(--text-color);
+            background-color: #4a5568;
+            color: #e2e8f0;
             border: none;
             border-radius: 0.5rem;
             padding: 0.5rem 0.75rem;
             cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        .difficulty-select select:hover {
-            background-color: #404040;
         }
 
         .game-buttons {
@@ -187,79 +179,75 @@
         }
 
         .game-button {
-            padding: 1rem 1.5rem;
+            padding: 0.75rem 1.5rem;
             font-size: 1rem;
             font-weight: 700;
-            border-radius: 1rem;
+            border-radius: 0.75rem;
             cursor: pointer;
-            transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            transition: background-color 0.2s, transform 0.2s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             border: none;
             flex-grow: 1;
             min-width: 150px;
         }
 
         .reset-button {
-            background-color: #6a1b9a;
+            background-color: #63b3ed;
             color: #fff;
         }
 
         .reset-button:hover {
-            background-color: #8e24aa;
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            background-color: #4299e1;
+            transform: translateY(-2px);
         }
 
         .new-game-button {
-            background-color: #1b5e20;
+            background-color: #48bb78;
             color: #fff;
         }
         
         .new-game-button:hover {
-            background-color: #2e7d32;
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            background-color: #38a169;
+            transform: translateY(-2px);
         }
 
         .menu-button {
-            padding: 1.25rem 2.5rem;
+            padding: 1rem 2rem;
             font-size: 1.25rem;
             font-weight: 700;
-            border-radius: 1.5rem;
+            border-radius: 1rem;
             cursor: pointer;
-            background-color: #333;
-            color: var(--text-color);
+            background-color: #4c556b;
+            color: #e2e8f0;
             border: none;
-            transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
+            transition: background-color 0.2s, transform 0.2s;
             width: 100%;
             max-width: 300px;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.1);
         }
         
         .menu-button:hover {
-            background-color: #444;
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            background-color: #5a637d;
+            transform: translateY(-2px);
         }
 
         .online-room-controls {
             display: flex;
             flex-direction: column;
-            gap: 1.5rem;
-            margin-top: 2rem;
-            padding: 2rem;
-            border-radius: 1.5rem;
-            background-color: #242424;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            gap: 1rem;
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            background-color: #3a4150;
         }
         
         .online-room-controls input {
-            padding: 1rem;
-            border-radius: 0.75rem;
-            border: 1px solid #444;
-            background-color: #1e1e1e;
-            color: var(--text-color);
-            font-size: 1.1rem;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            border: 1px solid #4a5568;
+            background-color: #4a5568;
+            color: #e2e8f0;
+            font-size: 1rem;
             text-align: center;
         }
 
@@ -270,21 +258,19 @@
         }
         
         .online-room-buttons button {
-            padding: 1rem 1.5rem;
+            padding: 0.75rem 1.5rem;
             font-size: 1rem;
             font-weight: 700;
-            border-radius: 1rem;
+            border-radius: 0.75rem;
             cursor: pointer;
-            transition: background-color 0.3s, transform 0.3s;
+            transition: background-color 0.2s;
             border: none;
-            background-color: var(--accent-purple);
+            background-color: #63b3ed;
             color: #fff;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
         }
         
         .online-room-buttons button:hover {
-            background-color: #7b1fa2;
-            transform: translateY(-2px);
+            background-color: #4299e1;
         }
 
         .hidden {
@@ -303,7 +289,6 @@
             z-index: 100;
             opacity: 0;
             transition: opacity 0.3s ease-in-out;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
         }
         
         .toast.show {
@@ -314,29 +299,15 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 0.75rem;
-            margin-bottom: 1.5rem;
-            background-color: #2e2e2e;
-            padding: 0.75rem 1.5rem;
-            border-radius: 1rem;
-        }
-        
-        #roomInfo {
-            font-size: 1.25rem;
-            font-weight: bold;
-            letter-spacing: 1px;
-            color: var(--accent-green);
+            gap: 0.5rem;
+            margin-bottom: 1rem;
         }
 
         #copyRoomIdBtn {
-            padding: 0.6rem;
-            background-color: #333;
-            border-radius: 0.75rem;
+            padding: 0.5rem;
+            background-color: #48bb78;
+            border-radius: 0.5rem;
             cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        #copyRoomIdBtn:hover {
-            background-color: #444;
         }
 
         @media (max-width: 640px) {
@@ -344,13 +315,13 @@
                 padding: 1.5rem;
             }
             .game-title {
-                font-size: 2.5rem;
+                font-size: 2rem;
             }
             .status {
                 font-size: 1.25rem;
             }
             .cell {
-                font-size: 3rem;
+                font-size: 2rem;
             }
             .game-buttons, .online-room-buttons {
                 flex-direction: column;
@@ -386,7 +357,7 @@
         <div id="gameInterface" class="hidden">
             <h1 class="game-title">Tic-Tac-Toe</h1>
             <div id="roomInfoContainer" class="hidden">
-                <h3 id="roomInfo" class="font-bold"></h3>
+                <h3 id="roomInfo" class="text-lg font-bold"></h3>
                 <button id="copyRoomIdBtn" title="Salin ID Ruangan">
                     <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
@@ -994,15 +965,11 @@
         // Fungsi untuk memulai ulang babak tanpa mengubah skor atau ukuran papan
         async function handleResetRound() {
             gameActive = true;
+            currentPlayer = playerSymbol;
             if (gameMode === 'single') {
-                 currentPlayer = playerSymbol;
-                 statusDisplay.textContent = singlePlayerTurn();
-                 createBoard(Array(boardSize * boardSize).fill(''));
-                 if (currentPlayer === computerSymbol) {
-                     setTimeout(handleComputerMove, 500);
-                 }
+                statusDisplay.textContent = singlePlayerTurn();
+                createBoard(Array(boardSize * boardSize).fill(''));
             } else if (gameMode === 'multi') {
-                currentPlayer = playerSymbol;
                 statusDisplay.textContent = multiPlayerTurn();
                 createBoard(Array(boardSize * boardSize).fill(''));
             } else if (gameMode === 'online') {
@@ -1097,6 +1064,7 @@
             playerYLabel.textContent = 'Pemain O';
             difficultySelectContainer.classList.add('hidden');
             gameInterface.classList.remove('hidden');
+            mainMenu.classList.add('hidden');
             handleResetGame();
         });
 
@@ -1146,4 +1114,4 @@
         init();
     </script>
 </body>
-  </html>
+    </html>
