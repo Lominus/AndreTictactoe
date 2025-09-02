@@ -4,1114 +4,648 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Game Tic-Tac-Toe</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --board-size: 3;
-        }
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #1a202c;
-            color: #e2e8f0;
+            background: linear-gradient(135deg, #1f2833 0%, #0b0c0f 100%);
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             margin: 0;
             padding: 20px;
-            overflow-x: hidden;
         }
 
-        .game-container {
-            background-color: #2d3748;
-            padding: 3rem;
-            border-radius: 1.5rem;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        #main-menu, #game-container {
+            background-color: #2a323c;
+            padding: 2.5rem;
+            border-radius: 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
             text-align: center;
+            max-width: 550px;
             width: 100%;
-            max-width: 600px;
+            transition: all 0.3s ease-in-out;
         }
 
-        .game-title {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: #63b3ed;
-            margin-bottom: 1rem;
+        @media (max-width: 600px) {
+            #main-menu, #game-container {
+                padding: 1.5rem;
+                border-radius: 1.5rem;
+            }
         }
 
-        .status {
+        .hidden {
+            display: none;
+        }
+        
+        .logo-container {
+            margin-bottom: 2rem;
+        }
+
+        .logo-text {
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: #66fcf1;
+            text-shadow: 0 0 5px #66fcf1, 0 0 10px #66fcf1, 0 0 20px #66fcf1;
+            animation: glow 1.5s infinite alternate ease-in-out;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 5px #66fcf1, 0 0 10px #66fcf1, 0 0 20px #66fcf1;
+                transform: scale(1);
+            }
+            to {
+                text-shadow: 0 0 10px #66fcf1, 0 0 30px #66fcf1, 0 0 50px #66fcf1;
+                transform: scale(1.02);
+            }
+        }
+
+        .menu-subtitle {
             font-size: 1.5rem;
-            font-weight: 700;
-            min-height: 2.5rem;
-            margin-bottom: 1.5rem;
-            color: #cbd5e0;
+            font-weight: 500;
+            color: #c5c6c7;
+            margin-bottom: 0.5rem;
         }
 
-        .score-board {
+        h1 {
+            font-size: 2.75rem;
+            font-weight: 700;
+            color: #c5c6c7;
+            margin-bottom: 1rem;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+
+        #message {
+            font-size: 1.35rem;
+            font-weight: 500;
+            color: #a9b1b7;
+            height: 30px;
+            margin-bottom: 2rem;
+            transition: color 0.3s;
+        }
+
+        #board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .square {
+            width: 100%;
+            height: 100px;
+            background-color: #3a4450;
+            border-radius: 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 3.5rem;
+            font-weight: bold;
+            color: #c5c6c7;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+        }
+
+        .square:hover:not(.player):not(.cpu) {
+            background-color: #4a525f;
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+        }
+
+        .square.player {
+            color: #45a29e; /* Biru kehijauan untuk 'X' */
+            text-shadow: 2px 2px 4px rgba(69, 162, 158, 0.4);
+        }
+
+        .square.cpu, .square.p2 {
+            color: #ff6b6b; /* Merah cerah untuk 'O' */
+            text-shadow: 2px 2px 4px rgba(255, 107, 107, 0.4);
+        }
+
+        .square.winner {
+            background-color: #2ecc71;
+            color: white;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+            100% { transform: scale(1); }
+        }
+
+        #difficulty-container {
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+        
+        .control-buttons {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        button {
+            padding: 0.75rem 1.75rem;
+            border-radius: 9999px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+        }
+
+        .btn-difficulty {
+            background-color: #4a525f;
+            color: #c5c6c7;
+        }
+
+        .btn-difficulty.active {
+            background-color: #66fcf1;
+            color: #0b0c0f;
+            box-shadow: 0 6px 12px rgba(102, 252, 241, 0.4);
+        }
+
+        .btn-menu {
+            width: 100%;
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+            background: linear-gradient(45deg, #45a29e, #1f2833);
+            color: white;
+        }
+
+        .btn-menu:last-child {
+            margin-bottom: 0;
+        }
+
+        .btn-menu:hover {
+            box-shadow: 0 8px 16px rgba(69, 162, 158, 0.2);
+            transform: translateY(-3px);
+        }
+        
+        .btn-menu:active {
+            transform: scale(0.95);
+        }
+
+        #new-round-button, #new-game-button {
+            width: 100%;
+        }
+
+        #new-round-button {
+            background: linear-gradient(45deg, #2ecc71, #27ae60);
+            color: white;
+        }
+        
+        #new-game-button {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            color: white;
+        }
+
+        #new-round-button:hover {
+            box-shadow: 0 8px 16px rgba(46, 204, 113, 0.2);
+            transform: translateY(-3px);
+        }
+        
+        #new-game-button:hover {
+            box-shadow: 0 8px 16px rgba(231, 76, 60, 0.2);
+            transform: translateY(-3px);
+        }
+        
+        #new-round-button:active, #new-game-button:active {
+            transform: scale(0.95);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+        }
+
+        #back-button {
+            background-color: #7f8c8d;
+            color: white;
+            width: 100%;
+            margin-top: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        #back-button:hover {
+            box-shadow: 0 8px 16px rgba(127, 140, 141, 0.2);
+            transform: translateY(-3px);
+        }
+        
+        #score-board {
             display: flex;
             justify-content: space-around;
-            background-color: #4a5568;
-            padding: 1rem;
-            border-radius: 0.75rem;
+            background-color: #3a4450;
+            padding: 1.5rem;
+            border-radius: 1.25rem;
             margin-bottom: 2rem;
-            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.4);
         }
 
         .score-item {
             text-align: center;
-        }
-
-        .score-label {
-            font-size: 1rem;
-            color: #a0aec0;
+            color: #a9b1b7;
+            font-weight: 600;
         }
 
         .score-value {
-            font-size: 1.875rem;
+            font-size: 2rem;
+            color: #66fcf1;
             font-weight: 700;
-            color: #e2e8f0;
         }
 
-        .board-info {
-            font-size: 1rem;
-            color: #a0aec0;
-            margin-bottom: 1rem;
+        .score-label {
+            font-size: 0.9rem;
+            text-transform: uppercase;
         }
         
-        .board {
-            display: grid;
-            grid-template-columns: repeat(var(--board-size), 1fr);
-            gap: 0.5rem;
-            margin-bottom: 2rem;
-            aspect-ratio: 1 / 1;
-            width: 100%;
-            position: relative;
+        .copyright-text {
+            color: #5a646c;
         }
 
-        .cell {
-            background-color: #4a5568;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 2.5rem;
-            font-weight: 700;
-            cursor: pointer;
-            border-radius: 0.5rem;
-            transition: background-color 0.2s;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            color: #a0aec0;
-        }
-
-        .cell:not(.full):hover {
-            background-color: #6b7280;
-        }
-
-        .cell.x {
-            color: #f56565;
-            text-shadow: 0 0 5px #f56565, 0 0 10px #f56565, 0 0 15px #f56565;
-            animation: pulse-x 1.5s infinite;
-        }
-
-        .cell.o {
-            color: #48bb78;
-            text-shadow: 0 0 5px #48bb78, 0 0 10px #48bb78, 0 0 15px #48bb78;
-            animation: pulse-o 1.5s infinite;
-        }
-
-        @keyframes pulse-x {
-            0%, 100% { text-shadow: 0 0 5px #f56565, 0 0 10px #f56565; }
-            50% { text-shadow: 0 0 10px #f56565, 0 0 20px #f56565; }
-        }
-
-        @keyframes pulse-o {
-            0%, 100% { text-shadow: 0 0 5px #48bb78, 0 0 10px #48bb78; }
-            50% { text-shadow: 0 0 10px #48bb78, 0 0 20px #48bb78; }
-        }
-        
-        .cell.full {
-            cursor: not-allowed;
-            animation: none;
-        }
-
-        #winningLine {
-            position: absolute;
-            background-color: #68d391;
-            z-index: 10;
-            border-radius: 9999px;
-            pointer-events: none;
-            transition: width 0.5s ease-out, height 0.5s ease-out;
-        }
-        
-        .game-controls {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-        
-        .difficulty-select {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-
-        .difficulty-select label {
-            font-size: 1rem;
-            color: #a0aec0;
-        }
-
-        .difficulty-select select {
-            background-color: #4a5568;
-            color: #e2e8f0;
-            border: none;
-            border-radius: 0.5rem;
-            padding: 0.5rem 0.75rem;
-            cursor: pointer;
-        }
-
-        .game-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .game-button {
-            padding: 0.75rem 1.5rem;
-            font-size: 1rem;
-            font-weight: 700;
-            border-radius: 0.75rem;
-            cursor: pointer;
-            transition: background-color 0.2s, transform 0.2s;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            border: none;
-            flex-grow: 1;
-            min-width: 150px;
-        }
-
-        .reset-button {
-            background-color: #63b3ed;
-            color: #fff;
-        }
-
-        .reset-button:hover {
-            background-color: #4299e1;
-            transform: translateY(-2px);
-        }
-
-        .new-game-button {
-            background-color: #48bb78;
-            color: #fff;
-        }
-        
-        .new-game-button:hover {
-            background-color: #38a169;
-            transform: translateY(-2px);
-        }
-
-        .menu-button {
-            padding: 1rem 2rem;
-            font-size: 1.25rem;
-            font-weight: 700;
-            border-radius: 1rem;
-            cursor: pointer;
-            background-color: #4c556b;
-            color: #e2e8f0;
-            border: none;
-            transition: background-color 0.2s, transform 0.2s;
-            width: 100%;
-            max-width: 300px;
-            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.1);
-        }
-        
-        .menu-button:hover {
-            background-color: #5a637d;
-            transform: translateY(-2px);
-        }
-
-        .online-room-controls {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            margin-top: 1.5rem;
-            padding: 1.5rem;
-            border-radius: 1rem;
-            background-color: #3a4150;
-        }
-        
-        .online-room-controls input {
-            padding: 0.75rem;
-            border-radius: 0.5rem;
-            border: 1px solid #4a5568;
-            background-color: #4a5568;
-            color: #e2e8f0;
-            font-size: 1rem;
-            text-align: center;
-        }
-
-        .online-room-buttons {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-        }
-        
-        .online-room-buttons button {
-            padding: 0.75rem 1.5rem;
-            font-size: 1rem;
-            font-weight: 700;
-            border-radius: 0.75rem;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            border: none;
-            background-color: #63b3ed;
-            color: #fff;
-        }
-        
-        .online-room-buttons button:hover {
-            background-color: #4299e1;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        .toast {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: rgba(0, 0, 0, 0.7);
-            color: #fff;
-            padding: 1rem 2rem;
-            border-radius: 9999px;
-            z-index: 100;
-            opacity: 0;
-            transition: opacity 0.3s ease-in-out;
-        }
-        
-        .toast.show {
-            opacity: 1;
-        }
-
-        #roomInfoContainer {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-        }
-
-        #copyRoomIdBtn {
-            padding: 0.5rem;
-            background-color: #48bb78;
-            border-radius: 0.5rem;
-            cursor: pointer;
-        }
-
-        @media (max-width: 640px) {
-            .game-container {
-                padding: 1.5rem;
+        @media (max-width: 600px) {
+            .square {
+                height: 80px;
+                font-size: 2.5rem;
             }
-            .game-title {
-                font-size: 2rem;
+            #board {
+                gap: 0.75rem;
             }
-            .status {
-                font-size: 1.25rem;
+            .score-value {
+                font-size: 1.75rem;
             }
-            .cell {
-                font-size: 2rem;
-            }
-            .game-buttons, .online-room-buttons {
-                flex-direction: column;
+            .logo-text {
+                font-size: 2.5rem;
             }
         }
     </style>
 </head>
 <body>
-    <div class="game-container">
-        <!-- Main Menu -->
-        <div id="mainMenu" class="game-controls flex flex-col items-center gap-4">
-            <h1 class="game-title">Pilih Mode Permainan</h1>
-            <button id="singlePlayerBtn" class="menu-button">Pemain Tunggal (vs Komputer)</button>
-            <button id="multiPlayerBtn" class="menu-button">Multiplayer (Lokal)</button>
-            <button id="onlinePlayerBtn" class="menu-button">Multiplayer (Online)</button>
+    <div id="main-menu">
+        <div class="logo-container">
+            <div class="logo-text">Andre</div>
         </div>
-        
-        <!-- Online Room UI -->
-        <div id="onlineRoomUI" class="hidden game-controls flex flex-col items-center gap-4">
-            <h1 class="game-title">Multiplayer Online</h1>
-            <div class="online-room-controls">
-                <p class="text-lg text-center font-bold">Gabung atau Buat Ruangan</p>
-                <input type="text" id="roomIdInput" placeholder="Masukkan ID Ruangan">
-                <div class="online-room-buttons">
-                    <button id="joinRoomBtn">Gabung Ruangan</button>
-                    <button id="createRoomBtn">Buat Ruangan Baru</button>
-                </div>
-            </div>
-            <button id="backToMenuBtn" class="game-button reset-button mt-4">Kembali ke Menu</button>
-        </div>
-
-        <!-- Game Interface -->
-        <div id="gameInterface" class="hidden">
-            <h1 class="game-title">Tic-Tac-Toe</h1>
-            <div id="roomInfoContainer" class="hidden">
-                <h3 id="roomInfo" class="text-lg font-bold"></h3>
-                <button id="copyRoomIdBtn" title="Salin ID Ruangan">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-                    </svg>
-                </button>
-            </div>
-            <div class="score-board">
-                <div class="score-item">
-                    <div id="playerXLabel" class="score-label">Pemain X</div>
-                    <div id="scoreX" class="score-value">0</div>
-                </div>
-                <div class="score-item">
-                    <div class="score-label">Seri</div>
-                    <div id="scoreTies" class="score-value">0</div>
-                </div>
-                <div class="score-item">
-                    <div id="playerYLabel" class="score-label">Pemain Y</div>
-                    <div id="scoreY" class="score-value">0</div>
-                </div>
-            </div>
-            <div class="game-controls">
-                <div id="difficultySelect" class="difficulty-select">
-                    <label for="difficulty">Pilih Kesulitan:</label>
-                    <select id="difficulty">
-                        <option value="easy">Mudah</option>
-                        <option value="medium" selected>Sedang</option>
-                        <option value="hard">Sulit</option>
-                    </select>
-                </div>
-                <div class="game-buttons">
-                    <button id="resetRoundButton" class="game-button reset-button">Mulai Ulang Babak</button>
-                    <button id="resetGameButton" class="game-button new-game-button">Mulai Game Baru</button>
-                </div>
-            </div>
-            <div id="boardInfo" class="board-info">Ukuran Papan: 3x3</div>
-            <div id="status" class="status">Giliran Anda</div>
-            <div id="board" class="board">
-                <div id="winningLine"></div>
-            </div>
-            <button id="backToMenuBtnFromGame" class="game-button reset-button mt-4">Kembali ke Menu</button>
-        </div>
+        <h2 class="menu-subtitle">Pilih Mode Permainan</h2>
+        <h1>Tic-Tac-Toe</h1>
+        <button id="single-player-button" class="btn-menu">Lawan Komputer</button>
+        <button id="multiplayer-button" class="btn-menu">Mode Multiplayer</button>
     </div>
-    <div id="toast" class="toast"></div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        setLogLevel('Debug');
+    <div id="game-container" class="hidden">
+        <div class="logo-container">
+            <div class="logo-text">Andre</div>
+        </div>
+        <h1>Tic-Tac-Toe</h1>
+        <div id="difficulty-container">
+            <button class="btn-difficulty active" data-difficulty="easy">Mudah</button>
+            <button class="btn-difficulty" data-difficulty="medium">Sedang</button>
+            <button class="btn-difficulty" data-difficulty="hard">Sulit</button>
+        </div>
+        <div id="score-board">
+            <div class="score-item">
+                <div class="score-value" id="player1-score">0</div>
+                <div class="score-label" id="player1-label">Anda</div>
+            </div>
+            <div class="score-item">
+                <div class="score-value" id="player2-score">0</div>
+                <div class="score-label" id="player2-label">CPU</div>
+            </div>
+            <div class="score-item">
+                <div class="score-value" id="draw-score">0</div>
+                <div class="score-label">Seri</div>
+            </div>
+        </div>
+        <div id="message"></div>
+        <div id="board">
+            <!-- Kotak-kotak permainan akan dibuat oleh JavaScript -->
+        </div>
+        <div class="control-buttons">
+            <button id="new-round-button">Mulai Babak Baru</button>
+            <button id="new-game-button">Mulai Game Baru</button>
+        </div>
+        <button id="back-button">Kembali ke Menu Utama</button>
+    </div>
 
-        // Global variables for Firebase, provided by the canvas environment
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : '';
+    <script>
+        const mainMenu = document.getElementById('main-menu');
+        const gameContainer = document.getElementById('game-container');
+        const singlePlayerButton = document.getElementById('single-player-button');
+        const multiplayerButton = document.getElementById('multiplayer-button');
+        const backButton = document.getElementById('back-button');
 
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth(app);
-        let userId = null;
+        const boardElement = document.getElementById('board');
+        const messageElement = document.getElementById('message');
+        const newRoundButton = document.getElementById('new-round-button');
+        const newGameButton = document.getElementById('new-game-button');
+        const difficultyButtons = document.querySelectorAll('.btn-difficulty');
+        const difficultyContainer = document.getElementById('difficulty-container');
+        const player1ScoreEl = document.getElementById('player1-score');
+        const player2ScoreEl = document.getElementById('player2-score');
+        const player1Label = document.getElementById('player1-label');
+        const player2Label = document.getElementById('player2-label');
+        const drawScoreEl = document.getElementById('draw-score');
 
-        // Mendapatkan semua elemen DOM yang diperlukan
-        const mainMenu = document.getElementById('mainMenu');
-        const onlineRoomUI = document.getElementById('onlineRoomUI');
-        const gameInterface = document.getElementById('gameInterface');
-        const singlePlayerBtn = document.getElementById('singlePlayerBtn');
-        const multiPlayerBtn = document.getElementById('multiPlayerBtn');
-        const onlinePlayerBtn = document.getElementById('onlinePlayerBtn');
-        const backToMenuBtn = document.getElementById('backToMenuBtn');
-        const backToMenuBtnFromGame = document.getElementById('backToMenuBtnFromGame');
-        
-        const roomIdInput = document.getElementById('roomIdInput');
-        const createRoomBtn = document.getElementById('createRoomBtn');
-        const joinRoomBtn = document.getElementById('joinRoomBtn');
-        const roomInfoContainer = document.getElementById('roomInfoContainer');
-        const roomInfoDisplay = document.getElementById('roomInfo');
-        const copyRoomIdBtn = document.getElementById('copyRoomIdBtn');
-
-        const boardContainer = document.getElementById('board');
-        const winningLine = document.getElementById('winningLine');
-        const statusDisplay = document.getElementById('status');
-        const boardInfoDisplay = document.getElementById('boardInfo');
-        const resetButton = document.getElementById('resetRoundButton');
-        const resetGameButton = document.getElementById('resetGameButton');
-        const scoreXDisplay = document.getElementById('scoreX');
-        const scoreYDisplay = document.getElementById('scoreY');
-        const scoreTiesDisplay = document.getElementById('scoreTies');
-        const difficultySelectContainer = document.getElementById('difficultySelect');
-        const difficultySelect = document.getElementById('difficulty');
-        const playerXLabel = document.getElementById('playerXLabel');
-        const playerYLabel = document.getElementById('playerYLabel');
-        const toast = document.getElementById('toast');
-
-        // Variabel status game
-        let gameBoard = [];
-        let boardSize = 3;
-        const playerSymbol = 'X';
-        const computerSymbol = 'O';
-        let currentPlayer = playerSymbol;
+        let board = ['', '', '', '', '', '', '', '', ''];
+        let currentPlayer = 'X';
         let gameActive = true;
-        let gameMode = '';
-        let myOnlineSymbol = '';
-        let onlineRoomId = '';
-        let unsubscribeFromRoom = null;
+        let difficulty = 'easy';
+        let scores = { player1: 0, player2: 0, draw: 0 };
+        let gameMode = 'singlePlayer'; // 'singlePlayer' or 'multiplayer'
 
-        let scores = {
-            [playerSymbol]: 0,
-            [computerSymbol]: 0,
-            Ties: 0
-        };
-        let difficultyLevel = difficultySelect.value;
-        const MAX_BOARD_SIZE = 4;
+        // Kombinasi kemenangan
+        const winningCombinations = [
+            [0, 1, 2],
+            [3, 4, 5],
+            [6, 7, 8],
+            [0, 3, 6],
+            [1, 4, 7],
+            [2, 5, 8],
+            [0, 4, 8],
+            [2, 4, 6]
+        ];
 
-        // Pesan untuk pengguna
-        const winningMessage = (winner) => {
-            if (gameMode === 'single') {
-                if (boardSize < MAX_BOARD_SIZE) {
-                    return `Anda Menang! Kotak Akan Bertambah!`;
-                } else {
-                    return `Anda Menang! Ukuran Papan Maksimal Tercapai!`;
-                }
-            } else if (gameMode === 'multi') {
-                 return `Pemain ${winner} Menang!`;
-            } else if (gameMode === 'online') {
-                 return winner === myOnlineSymbol ? `Anda Menang!` : `Lawan Menang!`;
-            }
-        };
-        const losingMessage = () => `Komputer Menang!`;
-        const drawMessage = () => `Permainan berakhir seri!`;
-        const singlePlayerTurn = () => `Giliran Anda`;
-        const multiPlayerTurn = () => `Giliran Pemain ${currentPlayer}`;
-        const onlineTurn = (symbol) => symbol === myOnlineSymbol ? 'Giliran Anda' : `Giliran lawan (${symbol})`;
-        const waitingForOpponent = () => 'Menunggu pemain lain...';
-
-        // --- Firebase & Online Game Logic ---
-
-        // Fungsi untuk menampilkan toast notification
-        function showToast(message) {
-            toast.textContent = message;
-            toast.classList.add('show');
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3000);
-        }
-
-        // Fungsi untuk membuat papan permainan secara dinamis
-        function createBoard(boardData = []) {
-            gameBoard = boardData;
-            boardContainer.innerHTML = '';
-            boardContainer.appendChild(winningLine);
-            boardContainer.style.setProperty('--board-size', boardSize);
-            boardInfoDisplay.textContent = `Ukuran Papan: ${boardSize}x${boardSize}`;
-
-            const totalCells = boardSize * boardSize;
-            for (let i = 0; i < totalCells; i++) {
-                const cell = document.createElement('div');
-                cell.classList.add('cell');
-                cell.dataset.cellIndex = i;
-                cell.addEventListener('click', handleCellClick);
-                
-                if (gameBoard[i]) {
-                    cell.textContent = gameBoard[i];
-                    cell.classList.add(gameBoard[i].toLowerCase(), 'full');
-                }
-                boardContainer.appendChild(cell);
-            }
-        }
-        
-        async function createNewGameRoom() {
-            if (!userId) {
-                showToast('Autentikasi gagal. Coba lagi.');
-                return;
-            }
-
-            onlineRoomId = crypto.randomUUID().substring(0, 8);
-            const gameRef = doc(db, `artifacts/${appId}/public/data/tictactoe_games`, onlineRoomId);
-            
-            try {
-                await setDoc(gameRef, {
-                    board: JSON.stringify(Array(boardSize * boardSize).fill('')),
-                    currentPlayer: 'X',
-                    gameActive: true,
-                    status: waitingForOpponent(),
-                    players: { X: userId, O: null },
-                    scores: { X: 0, O: 0, Ties: 0 },
-                    lastUpdated: Date.now()
-                });
-                myOnlineSymbol = 'X';
-                showToast(`Ruangan dibuat! ID: ${onlineRoomId}. Tunggu lawan.`);
-                
-                // Mulai mendengarkan perubahan pada ruangan
-                setupOnlineGameListener(onlineRoomId);
-
-            } catch (e) {
-                console.error("Error creating document: ", e);
-                showToast('Gagal membuat ruangan. Coba lagi.');
-            }
-        }
-
-        async function joinGameRoom() {
-            if (!userId) {
-                showToast('Autentikasi gagal. Coba lagi.');
-                return;
-            }
-
-            const roomId = roomIdInput.value.trim();
-            if (!roomId) {
-                showToast('Silakan masukkan ID ruangan.');
-                return;
-            }
-
-            const gameRef = doc(db, `artifacts/${appId}/public/data/tictactoe_games`, roomId);
-            const gameSnap = await getDoc(gameRef);
-
-            if (!gameSnap.exists()) {
-                showToast('ID ruangan tidak valid.');
-                return;
-            }
-
-            const gameData = gameSnap.data();
-            if (gameData.players.O) {
-                showToast('Ruangan sudah penuh.');
-                return;
-            }
-            
-            onlineRoomId = roomId;
-            myOnlineSymbol = 'O';
-
-            try {
-                await setDoc(gameRef, {
-                    ...gameData,
-                    players: { X: gameData.players.X, O: userId },
-                    status: 'Permainan dimulai',
-                    lastUpdated: Date.now()
-                });
-                
-                showToast(`Bergabung ke ruangan ${roomId}. Anda adalah O.`);
-                
-                // Mulai mendengarkan perubahan pada ruangan
-                setupOnlineGameListener(onlineRoomId);
-
-            } catch (e) {
-                console.error("Error joining document: ", e);
-                showToast('Gagal bergabung. Coba lagi.');
-            }
-        }
-
-        function handleCopyRoomId() {
-            if (onlineRoomId) {
-                const tempInput = document.createElement('input');
-                tempInput.value = onlineRoomId;
-                document.body.appendChild(tempInput);
-                tempInput.select();
-                document.execCommand('copy');
-                document.body.removeChild(tempInput);
-                showToast('ID Ruangan disalin!');
-            }
-        }
-
-        // Fungsi untuk mendengarkan perubahan data game secara real-time
-        function setupOnlineGameListener(roomId) {
-            if (unsubscribeFromRoom) {
-                unsubscribeFromRoom();
-            }
-            const gameRef = doc(db, `artifacts/${appId}/public/data/tictactoe_games`, roomId);
-            
-            unsubscribeFromRoom = onSnapshot(gameRef, (docSnap) => {
-                if (!docSnap.exists()) {
-                    showToast('Ruangan tidak ditemukan. Kembali ke menu.');
-                    backToMenu();
-                    return;
-                }
-                const gameData = docSnap.data();
-                
-                // Update UI based on Firestore data
-                gameActive = gameData.gameActive;
-                currentPlayer = gameData.currentPlayer;
-                scores = gameData.scores;
-                statusDisplay.textContent = gameData.status;
-                
-                // Cek apakah pemain kedua sudah bergabung
-                if (gameMode === 'online' && !gameData.players.O && myOnlineSymbol === 'X') {
-                    statusDisplay.textContent = waitingForOpponent();
-                } else {
-                    if (gameActive) {
-                        statusDisplay.textContent = onlineTurn(currentPlayer);
-                    }
-                }
-                
-                // Update papan
-                const boardArray = JSON.parse(gameData.board);
-                createBoard(boardArray);
-
-                updateScoreDisplay();
-
-                // Cek hasil game
-                if (!gameActive) {
-                    const winningCombination = getWinningCombination(boardArray, 'online');
-                    if (winningCombination) {
-                        drawWinningLine(winningCombination);
-                    }
-                }
-            });
-
-            // Pindah ke UI game setelah berhasil bergabung/membuat
-            mainMenu.classList.add('hidden');
-            onlineRoomUI.classList.add('hidden');
-            gameInterface.classList.remove('hidden');
-            difficultySelectContainer.classList.add('hidden');
-            playerXLabel.textContent = 'Anda (X)';
-            playerYLabel.textContent = 'Lawan (O)';
-            
-            // Tampilkan ID ruangan di antarmuka game
-            roomInfoDisplay.textContent = onlineRoomId;
-            roomInfoContainer.classList.remove('hidden');
-        }
-
-        // --- Game Logic (Same as before, but with database updates) ---
-
-        // Fungsi untuk memperbarui tampilan skor di UI
+        // Fungsi untuk mengupdate tampilan skor
         function updateScoreDisplay() {
-            scoreXDisplay.textContent = scores['X'];
-            scoreYDisplay.textContent = scores['O'];
-            scoreTiesDisplay.textContent = scores.Ties;
+            player1ScoreEl.textContent = scores.player1;
+            player2ScoreEl.textContent = scores.player2;
+            drawScoreEl.textContent = scores.draw;
         }
 
-        // Fungsi untuk menangani klik sel
-        async function handleCellClick(e) {
-            const clickedCell = e.target;
-            const clickedCellIndex = parseInt(clickedCell.dataset.cellIndex);
+        // Fungsi untuk membuat dan menampilkan papan permainan
+        function renderBoard() {
+            boardElement.innerHTML = '';
+            board.forEach((value, index) => {
+                const square = document.createElement('div');
+                square.classList.add('square');
+                square.setAttribute('data-index', index);
+                square.textContent = value;
+                if (value === 'X') {
+                    square.classList.add('player');
+                } else if (value === 'O') {
+                    square.classList.add(gameMode === 'singlePlayer' ? 'cpu' : 'p2');
+                }
+                square.addEventListener('click', () => handleSquareClick(index));
+                boardElement.appendChild(square);
+            });
+        }
 
-            // Periksa jika sel sudah terisi atau giliran bukan milik pemain ini atau game tidak aktif
-            if (gameBoard[clickedCellIndex] !== '' || !gameActive || (gameMode === 'online' && currentPlayer !== myOnlineSymbol)) {
-                return;
+        // Fungsi untuk mengupdate pesan status
+        function setMessage(msg, color = '#a9b1b7') {
+            messageElement.textContent = msg;
+            messageElement.style.color = color;
+        }
+
+        // Fungsi untuk mereset permainan
+        function resetGame(resetScores) {
+            board = ['', '', '', '', '', '', '', '', ''];
+            currentPlayer = 'X';
+            gameActive = true;
+            renderBoard();
+            setMessage(gameMode === 'singlePlayer' ? 'Giliran Anda' : 'Giliran Pemain 1');
+            if (resetScores) {
+                scores = { player1: 0, player2: 0, draw: 0 };
+                updateScoreDisplay();
             }
+        }
 
-            if (gameMode === 'online') {
-                const gameRef = doc(db, `artifacts/${appId}/public/data/tictactoe_games`, onlineRoomId);
-                const gameSnap = await getDoc(gameRef);
-                const gameData = gameSnap.data();
-
-                if (gameData.gameActive) {
-                    const updatedBoard = JSON.parse(gameData.board);
-                    updatedBoard[clickedCellIndex] = myOnlineSymbol;
-
-                    const winnerCombo = getWinningCombination(updatedBoard, 'online');
-                    const isDraw = updatedBoard.every(cell => cell !== '');
-                    const newScores = { ...gameData.scores };
-                    let newStatus = '';
-                    let newGameActive = true;
-
-                    if (winnerCombo) {
-                        newGameActive = false;
-                        newScores[myOnlineSymbol]++;
-                        newStatus = winningMessage(myOnlineSymbol);
-                    } else if (isDraw) {
-                        newGameActive = false;
-                        newScores.Ties++;
-                        newStatus = drawMessage();
-                    } else {
-                        newStatus = onlineTurn(myOnlineSymbol === 'X' ? 'O' : 'X');
-                    }
-
-                    await setDoc(gameRef, {
-                        ...gameData,
-                        board: JSON.stringify(updatedBoard),
-                        currentPlayer: myOnlineSymbol === 'X' ? 'O' : 'X',
-                        gameActive: newGameActive,
-                        status: newStatus,
-                        scores: newScores,
-                        lastUpdated: Date.now()
+        // Fungsi untuk memeriksa pemenang
+        function checkWinner() {
+            for (const combination of winningCombinations) {
+                const [a, b, c] = combination;
+                if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+                    gameActive = false;
+                    const winningSymbol = board[a];
+                    
+                    document.querySelectorAll('.square').forEach((square, index) => {
+                        if (combination.includes(index)) {
+                            square.classList.add('winner');
+                        }
                     });
-                }
-            } else { // Single or Local Multiplayer
-                 if (gameBoard[clickedCellIndex] !== '' || !gameActive) {
-                     return;
-                 }
-                 gameBoard[clickedCellIndex] = currentPlayer;
-                 clickedCell.textContent = currentPlayer;
-                 clickedCell.classList.add(currentPlayer.toLowerCase(), 'full');
-                 checkResultValidation();
-                 
-                 if (gameActive) {
-                    if (gameMode === 'single') {
-                        setTimeout(handleComputerMove, 500);
+
+                    if (winningSymbol === 'X') {
+                        setMessage((gameMode === 'singlePlayer' ? 'Anda' : 'Pemain 1') + ' Menang!', '#2ecc71');
+                        scores.player1++;
                     } else {
-                        currentPlayer = currentPlayer === playerSymbol ? 'O' : playerSymbol;
-                        statusDisplay.textContent = multiPlayerTurn();
+                        setMessage((gameMode === 'singlePlayer' ? 'CPU' : 'Pemain 2') + ' Menang!', '#e74c3c');
+                        scores.player2++;
                     }
+                    updateScoreDisplay();
+                    return true;
                 }
             }
+            return false;
+        }
+
+        // Fungsi untuk memeriksa hasil seri
+        function checkDraw() {
+            if (!board.includes('')) {
+                gameActive = false;
+                setMessage('Permainan Seri!', '#f39c12');
+                scores.draw++;
+                updateScoreDisplay();
+                return true;
+            }
+            return false;
+        }
+
+        // Logika AI - Mode Mudah
+        function cpuMoveEasy() {
+            const emptySquares = board.map((val, idx) => val === '' ? idx : null).filter(val => val !== null);
+            if (emptySquares.length > 0) {
+                const randomIndex = Math.floor(Math.random() * emptySquares.length);
+                return emptySquares[randomIndex];
+            }
+            return null;
+        }
+
+        // Logika AI - Mode Sedang
+        function cpuMoveMedium() {
+            // 1. Cek apakah CPU bisa menang di giliran ini
+            for (const combo of winningCombinations) {
+                const [a, b, c] = combo;
+                const squares = [board[a], board[b], board[c]];
+                if (squares.filter(s => s === 'O').length === 2 && squares.includes('')) {
+                    return combo[squares.indexOf('')];
+                }
+            }
+            // 2. Cek apakah pemain bisa menang, dan blokir
+            for (const combo of winningCombinations) {
+                const [a, b, c] = combo;
+                const squares = [board[a], board[b], board[c]];
+                if (squares.filter(s => s === 'X').length === 2 && squares.includes('')) {
+                    return combo[squares.indexOf('')];
+                }
+            }
+            // 3. Ambil sudut atau tengah jika kosong
+            const corners = [0, 2, 6, 8];
+            const center = 4;
+            if (board[center] === '') return center;
+            for (const corner of corners) {
+                if (board[corner] === '') return corner;
+            }
+            // 4. Jika tidak ada, ambil posisi acak
+            return cpuMoveEasy();
         }
         
-        // --- Minimax & AI logic (unchanged) ---
-        function handleComputerMove() {
-            switch (difficultyLevel) {
-                case 'easy': moveEasy(); break;
-                case 'medium': moveMedium(); break;
-                case 'hard': moveHard(); break;
-            }
-            checkResultValidation();
-        }
-        function moveEasy() {
-            let emptyCells = getEmptyCells();
-            if (emptyCells.length > 0) {
-                const randomIndex = Math.floor(Math.random() * emptyCells.length);
-                makeMove(emptyCells[randomIndex], computerSymbol);
-            }
-        }
-        function moveMedium() {
-            let move;
-            move = findWinningOrBlockingMove(computerSymbol);
-            if (move !== null) { makeMove(move, computerSymbol); return; }
-            move = findWinningOrBlockingMove(playerSymbol);
-            if (move !== null) { makeMove(move, computerSymbol); return; }
-            moveEasy();
-        }
-        function moveHard() {
-            let bestScore = -Infinity;
-            let bestMove = null;
-            let emptyCells = getEmptyCells();
-            for (let i = 0; i < emptyCells.length; i++) {
-                let index = emptyCells[i];
-                gameBoard[index] = computerSymbol;
-                let score = minimax(gameBoard, 0, false);
-                gameBoard[index] = '';
-                if (score > bestScore) {
-                    bestScore = score;
-                    bestMove = index;
+        // Algoritma Minimax untuk Mode Sulit
+        function minimax(newBoard, player) {
+            const emptySquares = newBoard.map((val, idx) => val === '' ? idx : null).filter(val => val !== null);
+
+            // Cek kondisi terminal (menang/seri)
+            for (const combo of winningCombinations) {
+                const [a, b, c] = combo;
+                if (newBoard[a] && newBoard[a] === newBoard[b] && newBoard[a] === newBoard[c]) {
+                    if (newBoard[a] === 'X') return { score: -10 };
+                    if (newBoard[a] === 'O') return { score: 10 };
                 }
             }
-            makeMove(bestMove, computerSymbol);
-        }
-        function minimax(board, depth, isMaximizing) {
-            const winningCombination = getWinningCombination(board);
-            if (winningCombination) {
-                const winner = board[winningCombination[0]];
-                if (winner === computerSymbol) return 10 - depth;
-                if (winner === playerSymbol) return -10 + depth;
+            if (emptySquares.length === 0) {
+                return { score: 0 };
             }
-            if (getEmptyCells(board).length === 0) return 0;
-            if (isMaximizing) {
+
+            const moves = [];
+
+            for (let i = 0; i < emptySquares.length; i++) {
+                const move = {};
+                move.index = emptySquares[i];
+                newBoard[emptySquares[i]] = player;
+
+                if (player === 'O') {
+                    const result = minimax(newBoard, 'X');
+                    move.score = result.score;
+                } else {
+                    const result = minimax(newBoard, 'O');
+                    move.score = result.score;
+                }
+
+                newBoard[emptySquares[i]] = '';
+                moves.push(move);
+            }
+
+            let bestMove;
+            if (player === 'O') {
                 let bestScore = -Infinity;
-                let emptyCells = getEmptyCells(board);
-                for (let i = 0; i < emptyCells.length; i++) {
-                    let index = emptyCells[i];
-                    board[index] = computerSymbol;
-                    let score = minimax(board, depth + 1, false);
-                    board[index] = '';
-                    bestScore = Math.max(bestScore, score);
+                for (let i = 0; i < moves.length; i++) {
+                    if (moves[i].score > bestScore) {
+                        bestScore = moves[i].score;
+                        bestMove = i;
+                    }
                 }
-                return bestScore;
             } else {
                 let bestScore = Infinity;
-                let emptyCells = getEmptyCells(board);
-                for (let i = 0; i < emptyCells.length; i++) {
-                    let index = emptyCells[i];
-                    board[index] = playerSymbol;
-                    let score = minimax(board, depth + 1, true);
-                    board[index] = '';
-                    bestScore = Math.min(bestScore, score);
-                }
-                return bestScore;
-            }
-        }
-        function findWinningOrBlockingMove(symbol) {
-            const totalCells = boardSize * boardSize;
-            const tempBoard = [...gameBoard];
-            for (let i = 0; i < totalCells; i++) {
-                if (tempBoard[i] === '') {
-                    tempBoard[i] = symbol;
-                    if (getWinningCombination(tempBoard)) {
-                        return i;
+                for (let i = 0; i < moves.length; i++) {
+                    if (moves[i].score < bestScore) {
+                        bestScore = moves[i].score;
+                        bestMove = i;
                     }
-                    tempBoard[i] = '';
                 }
             }
-            return null;
-        }
-        function makeMove(index, symbol) {
-            gameBoard[index] = symbol;
-            const cellElement = boardContainer.querySelector(`[data-cell-index="${index}"]`);
-            cellElement.textContent = symbol;
-            cellElement.classList.add(symbol.toLowerCase(), 'full');
+            return moves[bestMove];
         }
 
-        // Fungsi untuk memeriksa hasil game (menang atau seri)
-        function checkResultValidation() {
-            const winningCombination = getWinningCombination(gameBoard);
-            if (winningCombination) {
-                gameActive = false;
-                drawWinningLine(winningCombination);
-                const winner = gameBoard[winningCombination[0]];
-                if (gameMode === 'single') {
-                     if (winner === playerSymbol) {
-                        statusDisplay.textContent = winningMessage(winner);
-                        scores[playerSymbol]++;
-                        if (boardSize < MAX_BOARD_SIZE) {
-                            setTimeout(createNewLargerGame, 1500);
-                        }
-                    } else {
-                        statusDisplay.textContent = losingMessage();
-                        scores[computerSymbol]++;
-                    }
-                } else if (gameMode === 'multi') {
-                    statusDisplay.textContent = winningMessage(winner);
-                    scores[winner]++;
-                }
-                updateScoreDisplay();
-                return;
-            }
-
-            let roundDraw = getEmptyCells().length === 0;
-            if (roundDraw) {
-                statusDisplay.textContent = drawMessage();
-                gameActive = false;
-                scores.Ties++;
-                updateScoreDisplay();
-                return;
-            }
-        }
-
-        // Fungsi untuk mendapatkan kombinasi kemenangan pada papan dinamis
-        function getWinningCombination(board, mode = 'local') {
-            const size = Math.sqrt(board.length);
-            const symbols = mode === 'online' ? ['X', 'O'] : (gameMode === 'single' ? [playerSymbol, computerSymbol] : [playerSymbol, 'O']);
-            
-            for (const symbol of symbols) {
-                // Cek baris dan kolom
-                for (let i = 0; i < size; i++) {
-                    let row = [];
-                    let rowWin = true;
-                    for (let j = 0; j < size; j++) {
-                        if (board[i * size + j] !== symbol) rowWin = false;
-                        row.push(i * size + j);
-                    }
-                    if (rowWin) return row;
-
-                    let col = [];
-                    let colWin = true;
-                    for (let j = 0; j < size; j++) {
-                        if (board[j * size + i] !== symbol) colWin = false;
-                        col.push(j * size + i);
-                    }
-                    if (colWin) return col;
-                }
-
-                let mainDiag = [];
-                let mainDiagWin = true;
-                for (let i = 0; i < size; i++) {
-                    if (board[i * size + i] !== symbol) mainDiagWin = false;
-                    mainDiag.push(i * size + i);
-                }
-                if (mainDiagWin) return mainDiag;
-
-                let antiDiag = [];
-                let antiDiagWin = true;
-                for (let i = 0; i < size; i++) {
-                    if (board[i * size + (size - 1 - i)] !== symbol) antiDiagWin = false;
-                    antiDiag.push(i * size + (size - 1 - i));
-                }
-                if (antiDiagWin) return antiDiag;
-            }
-            return null;
-        }
-
-        // Fungsi untuk menggambar garis kemenangan
-        function drawWinningLine(cells) {
-            const firstCell = boardContainer.querySelector(`[data-cell-index="${cells[0]}"]`);
-            const lastCell = boardContainer.querySelector(`[data-cell-index="${cells[cells.length - 1]}"]`);
-            
-            const firstRect = firstCell.getBoundingClientRect();
-            const lastRect = lastCell.getBoundingClientRect();
-            const boardRect = boardContainer.getBoundingClientRect();
-
-            const startX = firstRect.left + firstRect.width / 2 - boardRect.left;
-            const startY = firstRect.top + firstRect.height / 2 - boardRect.top;
-            const endX = lastRect.left + lastRect.width / 2 - boardRect.left;
-            const endY = lastRect.top + lastRect.height / 2 - boardRect.top;
-
-            const dx = endX - startX;
-            const dy = endY - startY;
-            const length = Math.sqrt(dx * dx + dy * dy);
-            const angle = Math.atan2(dy, dx) * 180 / Math.PI;
-
-            winningLine.style.left = `${startX}px`;
-            winningLine.style.top = `${startY}px`;
-            winningLine.style.width = `0px`;
-            winningLine.style.height = `10px`;
-            winningLine.style.transform = `rotate(${angle}deg)`;
-            winningLine.style.transformOrigin = `0% 50%`;
-            winningLine.style.display = 'block';
+        // Logika giliran CPU
+        function handleCpuTurn() {
+            if (!gameActive) return;
 
             setTimeout(() => {
-                winningLine.style.width = `${length}px`;
-            }, 50);
-        }
-
-        // Helper function untuk mendapatkan sel kosong
-        function getEmptyCells(board = gameBoard) {
-            return board.map((cell, index) => cell === '' ? index : null).filter(index => index !== null);
-        }
-
-        // Fungsi untuk memulai ulang babak tanpa mengubah skor atau ukuran papan
-        async function handleResetRound() {
-            gameActive = true;
-            currentPlayer = playerSymbol;
-            if (gameMode === 'single') {
-                statusDisplay.textContent = singlePlayerTurn();
-                createBoard(Array(boardSize * boardSize).fill(''));
-            } else if (gameMode === 'multi') {
-                statusDisplay.textContent = multiPlayerTurn();
-                createBoard(Array(boardSize * boardSize).fill(''));
-            } else if (gameMode === 'online') {
-                 if (onlineRoomId) {
-                     const gameRef = doc(db, `artifacts/${appId}/public/data/tictactoe_games`, onlineRoomId);
-                     const gameSnap = await getDoc(gameRef);
-                     if (gameSnap.exists()) {
-                         const gameData = gameSnap.data();
-                         await setDoc(gameRef, {
-                             ...gameData,
-                             board: JSON.stringify(Array(boardSize * boardSize).fill('')),
-                             currentPlayer: 'X',
-                             gameActive: true,
-                             status: onlineTurn('X'),
-                             lastUpdated: Date.now()
-                         });
-                     }
-                 }
-            }
-            winningLine.style.display = 'none';
-            winningLine.style.width = '0';
-        }
-        
-        // Fungsi untuk membuat papan yang lebih besar setelah menang
-        function createNewLargerGame() {
-            boardSize++;
-            handleResetRound();
-        }
-
-        // Fungsi untuk memulai game baru dari awal (reset skor dan papan)
-        async function handleResetGame() {
-            boardSize = 3;
-            if (gameMode === 'online') {
-                if (onlineRoomId) {
-                     const gameRef = doc(db, `artifacts/${appId}/public/data/tictactoe_games`, onlineRoomId);
-                     const gameSnap = await getDoc(gameRef);
-                     if (gameSnap.exists()) {
-                         const gameData = gameSnap.data();
-                         await setDoc(gameRef, {
-                             ...gameData,
-                             scores: { X: 0, O: 0, Ties: 0 },
-                             lastUpdated: Date.now()
-                         });
-                     }
+                let cpuIndex;
+                if (difficulty === 'easy') {
+                    cpuIndex = cpuMoveEasy();
+                } else if (difficulty === 'medium') {
+                    cpuIndex = cpuMoveMedium();
+                } else if (difficulty === 'hard') {
+                    cpuIndex = minimax(board, 'O').index;
                 }
-            } else {
-                scores = { [playerSymbol]: 0, [computerSymbol]: 0, Ties: 0 };
-            }
-            updateScoreDisplay();
-            handleResetRound();
+                
+                if (cpuIndex !== null) {
+                    board[cpuIndex] = 'O';
+                    renderBoard();
+                    if (!checkWinner() && !checkDraw()) {
+                        currentPlayer = 'X';
+                        setMessage('Giliran Anda');
+                    }
+                }
+            }, 500);
         }
 
-        // Fungsi untuk kembali ke menu utama
-        function backToMenu() {
-            gameInterface.classList.add('hidden');
-            onlineRoomUI.classList.add('hidden');
-            mainMenu.classList.remove('hidden');
-            if (unsubscribeFromRoom) {
-                unsubscribeFromRoom();
+        // Handler klik kotak
+        function handleSquareClick(index) {
+            if (!gameActive || board[index] !== '') {
+                return;
             }
-            onlineRoomId = '';
-            roomIdInput.value = '';
-            roomInfoDisplay.textContent = '';
-            roomInfoContainer.classList.add('hidden');
-            handleResetGame();
-        }
 
-        // Menambahkan event listener ke tombol dan dropdown
-        resetButton.addEventListener('click', handleResetRound);
-        resetGameButton.addEventListener('click', handleResetGame);
-        difficultySelect.addEventListener('change', (e) => {
-            difficultyLevel = e.target.value;
-            handleResetGame();
-        });
-        backToMenuBtn.addEventListener('click', backToMenu);
-        backToMenuBtnFromGame.addEventListener('click', backToMenu);
-
-        // Event listener untuk menu utama
-        singlePlayerBtn.addEventListener('click', () => {
-            gameMode = 'single';
-            playerXLabel.textContent = 'Pemain (X)';
-            playerYLabel.textContent = 'Komputer (O)';
-            difficultySelectContainer.classList.remove('hidden');
-            gameInterface.classList.remove('hidden');
-            mainMenu.classList.add('hidden');
-            handleResetGame();
-        });
-        
-        multiPlayerBtn.addEventListener('click', () => {
-            gameMode = 'multi';
-            playerXLabel.textContent = 'Pemain X';
-            playerYLabel.textContent = 'Pemain O';
-            difficultySelectContainer.classList.add('hidden');
-            gameInterface.classList.remove('hidden');
-            mainMenu.classList.add('hidden');
-            handleResetGame();
-        });
-
-        onlinePlayerBtn.addEventListener('click', () => {
-            gameMode = 'online';
-            mainMenu.classList.add('hidden');
-            onlineRoomUI.classList.remove('hidden');
-        });
-
-        createRoomBtn.addEventListener('click', createNewGameRoom);
-        joinRoomBtn.addEventListener('click', joinGameRoom);
-        copyRoomIdBtn.addEventListener('click', handleCopyRoomId);
-        
-        // --- Initialization ---
-
-        // Autentikasi pengguna secara anonim saat memuat
-        async function authenticate() {
-            try {
-                if (initialAuthToken) {
-                    await signInWithCustomToken(auth, initialAuthToken);
+            board[index] = currentPlayer;
+            renderBoard();
+            
+            if (!checkWinner() && !checkDraw()) {
+                if (gameMode === 'singlePlayer') {
+                    currentPlayer = 'O';
+                    setMessage('Giliran CPU');
+                    handleCpuTurn();
                 } else {
-                    await signInAnonymously(auth);
+                    currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+                    setMessage(currentPlayer === 'X' ? 'Giliran Pemain 1' : 'Giliran Pemain 2');
                 }
-            } catch (error) {
-                console.error("Firebase Auth error:", error);
-                showToast("Gagal mengautentikasi. Fitur online mungkin tidak berfungsi.");
             }
         }
+
+        // Event listeners untuk tombol mode kesulitan
+        difficultyButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                difficultyButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                difficulty = button.dataset.difficulty;
+                resetGame(true);
+            });
+        });
+
+        // Event listener untuk tombol mulai babak baru
+        newRoundButton.addEventListener('click', () => resetGame(false));
         
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                userId = user.uid;
-                console.log("User authenticated with UID:", userId);
-            } else {
-                console.log("No user is signed in.");
-            }
+        // Event listener untuk tombol mulai game baru
+        newGameButton.addEventListener('click', () => resetGame(true));
+
+        // Fungsi untuk menampilkan menu utama
+        function showMainMenu() {
+            mainMenu.classList.remove('hidden');
+            gameContainer.classList.add('hidden');
+        }
+
+        // Fungsi untuk memulai permainan
+        function startGame() {
+            mainMenu.classList.add('hidden');
+            gameContainer.classList.remove('hidden');
+            resetGame(true);
+        }
+        
+        // Event listener untuk tombol menu utama
+        singlePlayerButton.addEventListener('click', () => {
+            gameMode = 'singlePlayer';
+            difficultyContainer.classList.remove('hidden');
+            player1Label.textContent = 'Anda';
+            player2Label.textContent = 'CPU';
+            startGame();
+        });
+
+        multiplayerButton.addEventListener('click', () => {
+            gameMode = 'multiplayer';
+            difficultyContainer.classList.add('hidden');
+            player1Label.textContent = 'Pemain 1';
+            player2Label.textContent = 'Pemain 2';
+            startGame();
         });
         
-        authenticate();
-        
-        function init() {
-            mainMenu.classList.remove('hidden');
-            gameInterface.classList.add('hidden');
-            onlineRoomUI.classList.add('hidden');
-        }
-        
-        init();
+        backButton.addEventListener('click', showMainMenu);
+
+        // Inisialisasi awal, menampilkan menu utama
+        showMainMenu();
     </script>
 </body>
 </html>
+
